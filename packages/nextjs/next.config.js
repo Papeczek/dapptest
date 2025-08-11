@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Determine if we are in development mode
-const isDev = process.env.NODE_ENV === "development";
+const isDev = true;
 
 if (isDev) {
   const rootEnvPath = path.resolve(__dirname, "../../.env");

@@ -353,6 +353,7 @@ export default function GamePage() {
             stablecoinAmount = fmtAbs(a0, pool.token0.decimals);
             token0In = a0 > 0n;
           }
+          console.log(stablecoinAmountBigInt);
 
           const swapValue = parseFloat(stablecoinAmount);
           
