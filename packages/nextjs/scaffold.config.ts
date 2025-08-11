@@ -1,13 +1,21 @@
+// packages/nextjs/scaffold.config.ts
 import chainConfig from "./config/chainConfig.json";
 import * as chains from "viem/chains";
+import { sepolia } from "viem/chains";
 
 const isProd = process.env.NODE_ENV === "production";
 const simulateProd = process.env.NEXT_PUBLIC_SIMULATE_PROD === "true";
-const chainId = isProd || simulateProd ? chainConfig.mainnetChainId : chainConfig.testnetChainId;
-const chain = Object.values(chains).find(chain => chain.id === chainId);
-if (!chain) {
-  throw new Error(`Chain with ID ${chainId} not found`);
-}
+const forceSepolia = process.env.NEXT_PUBLIC_FORCE_SEPOLIA === "true"; // ✅ override flag
+
+// If forced, use Sepolia (11155111). Otherwise keep your original logic.
+const resolvedChainId = forceSepolia
+  ? 11155111
+  : (isProd || simulateProd ? chainConfig.mainnetChainId : chainConfig.testnetChainId);
+
+// Find the chain object by id; if for some reason not found, fall back to Sepolia.
+const chain =
+  (Object.values(chains).find((c: any) => typeof c?.id === "number" && c.id === resolvedChainId) as chains.Chain | undefined) ||
+  (sepolia as unknown as chains.Chain);
 
 export type ScaffoldConfig = {
   targetNetworks: readonly chains.Chain[];
@@ -20,20 +28,15 @@ const scaffoldConfig = {
   // The networks on which your DApp is live
   targetNetworks: [chain],
 
-  // The interval at which your front-end polls the RPC servers for new data
-  // it has no effect if you only target the local network (default is 4000)
+  // Polling interval for RPC
   pollingInterval: 30000,
 
-  // This is the expected time it takes for a user operation to be included in a block.
-  // This is used to calculate the progress of the transaction.
-  // set it to 0 to disable the progress bar
+  // Expected time for a userOp to get included (ms)
   expectedUserOpTime: 10_000,
 
-  // This is our default project ID.
-  // You can get your own at https://cloud.walletconnect.com
-  // It's recommended to store it in an env variable:
-  // .env.local for local testing, and in the Vercel/system env config for live apps.
-  walletConnectProjectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "3a8170812b534d0ff9d794f19a901d64",
+  // WalletConnect
+  walletConnectProjectId:
+    process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "3a8170812b534d0ff9d794f19a901d64",
 } as const satisfies ScaffoldConfig;
 
 export default scaffoldConfig;

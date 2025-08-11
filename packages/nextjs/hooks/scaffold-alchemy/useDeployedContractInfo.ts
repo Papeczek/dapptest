@@ -44,9 +44,15 @@ export function useDeployedContractInfo<TContractName extends ContractName>(
       );
     }
   }, [configOrName]);
-  const { contractName, chainId } = finalConfig;
+    const { contractName, chainId } = finalConfig;
   const selectedNetwork = useSelectedNetwork(chainId);
-  const deployedContract = contracts?.[selectedNetwork.id]?.[contractName as ContractName] as Contract<TContractName>;
+
+  const chainIdNum = Number(selectedNetwork.id); // 👈 cast to plain number
+
+  const deployedContract =
+    (contracts as Record<number, Record<ContractName, Contract<any>>>)
+      [chainIdNum]?.[contractName as ContractName] as Contract<TContractName>;
+
   const [status, setStatus] = useState<ContractCodeStatus>(ContractCodeStatus.LOADING);
   const publicClient = usePublicClient({ chainId: selectedNetwork.id });
 
