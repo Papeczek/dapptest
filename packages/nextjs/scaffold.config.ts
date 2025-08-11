@@ -3,8 +3,8 @@ import * as chains from "viem/chains";
 
 const isProd = process.env.NODE_ENV === "production";
 const simulateProd = process.env.NEXT_PUBLIC_SIMULATE_PROD === "true";
-const chainId = isProd || simulateProd ? chainConfig.mainnetChainId : chainConfig.testnetChainId;
-const chain = Object.values(chains).find(chain => chain.id === chainId);
+const chainId = 11155111;
+const chain = chains.sepolia;
 if (!chain) {
   throw new Error(`Chain with ID ${chainId} not found`);
 }
